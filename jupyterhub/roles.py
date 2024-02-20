@@ -1,4 +1,5 @@
 """Roles utils"""
+
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import re
@@ -46,6 +47,7 @@ def get_default_roles():
                 'access:servers',
                 'read:roles',
                 'read:metrics',
+                'shares',
             ],
         },
         {

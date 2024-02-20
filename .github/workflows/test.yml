@@ -36,7 +36,7 @@ permissions:
 jobs:
   # Run "pytest jupyterhub/tests" in various configurations
   pytest:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
 
     strategy:
@@ -84,7 +84,7 @@ jobs:
             db: mysql
           - python: "3.10"
             db: postgres
-          - python: "3.11"
+          - python: "3.12"
             subdomain: subdomain
             serverextension: serverextension
           - python: "3.11"
@@ -103,7 +103,7 @@ jobs:
             subset: singleuser
           - python: "3.11"
             browser: browser
-          - python: "3.11"
+          - python: "3.12"
             main_dependencies: main_dependencies
 
     steps:
@@ -137,22 +137,22 @@ jobs:
               echo "JUPYTERHUB_SINGLEUSER_APP=jupyverse" >> $GITHUB_ENV
           fi
       - uses: actions/checkout@v4
-      # NOTE: actions/setup-node@v3 make use of a cache within the GitHub base
+      # NOTE: actions/setup-node@v4 make use of a cache within the GitHub base
       #       environment and setup in a fraction of a second.
-      - name: Install Node v14
-        uses: actions/setup-node@v3
+      - name: Install Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "14"
+          node-version: "20"
       - name: Install Javascript dependencies
         run: |
           npm install
           npm install -g configurable-http-proxy yarn
           npm list
 
-      # NOTE: actions/setup-python@v4 make use of a cache within the GitHub base
+      # NOTE: actions/setup-python@v5 make use of a cache within the GitHub base
       #       environment and setup in a fraction of a second.
       - name: Install Python ${{ matrix.python }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python }}"
 
@@ -250,10 +250,10 @@ jobs:
         run: |
           pytest -k "${{ matrix.subset }}" --maxfail=2 --cov=jupyterhub jupyterhub/tests
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
 
   docker-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
 
     steps:

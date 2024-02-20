@@ -6,7 +6,7 @@
 #
 # Option 1:
 #
-# FROM jupyterhub/jupyterhub:latest
+# FROM quay.io/jupyterhub/jupyterhub:latest
 #
 # And put your configuration file jupyterhub_config.py in /srv/jupyterhub/jupyterhub_config.py.
 #
@@ -14,10 +14,10 @@
 #
 # Or you can create your jupyterhub config and database on the host machine, and mount it with:
 #
-# docker run -v $PWD:/srv/jupyterhub -t jupyterhub/jupyterhub
+# docker run -v $PWD:/srv/jupyterhub -t quay.io/jupyterhub/jupyterhub
 #
 # NOTE
-# If you base on jupyterhub/jupyterhub-onbuild
+# If you base on quay.io/jupyterhub/jupyterhub-onbuild
 # your jupyterhub_config.py will be added automatically
 # from your docker directory.
 
@@ -60,8 +60,7 @@ RUN mkdir -p /etc/apt/keyrings \
  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
  && apt-get update \
  && apt-get install -yqq --no-install-recommends \
-    nodejs \
- && npm install --global yarn
+    nodejs
 
 WORKDIR /src/jupyterhub
 # copy everything except whats in .dockerignore, its a

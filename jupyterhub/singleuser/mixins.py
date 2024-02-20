@@ -713,6 +713,7 @@ class SingleUserNotebookAppMixin(Configurable):
         Only has effect on jupyterlab_server >=2.9
         """
         page_config["token"] = self.hub_auth.get_token(handler) or ""
+        page_config["hubServerUser"] = os.environ.get("JUPYTERHUB_USER", "")
         return page_config
 
     def patch_default_headers(self):
@@ -734,9 +735,9 @@ class SingleUserNotebookAppMixin(Configurable):
         )
         self.jinja_template_vars['hub_host'] = self.hub_host
         self.jinja_template_vars['hub_prefix'] = self.hub_prefix
-        self.jinja_template_vars[
-            'hub_control_panel_url'
-        ] = self.hub_host + url_path_join(self.hub_prefix, 'home')
+        self.jinja_template_vars['hub_control_panel_url'] = (
+            self.hub_host + url_path_join(self.hub_prefix, 'home')
+        )
 
         settings = self.web_app.settings
         # patch classic notebook jinja env
@@ -856,13 +857,21 @@ def _patch_app_base_handlers(app):
     if BaseHandler is not None:
         base_handlers.append(BaseHandler)
 
-    # patch juptyer_server and notebook handlers if they have been imported
+    # patch jupyter_server and notebook handlers if they have been imported
     for base_handler_name in [
         "jupyter_server.base.handlers.JupyterHandler",
         "notebook.base.handlers.IPythonHandler",
     ]:
         modname, _ = base_handler_name.rsplit(".", 1)
         if modname in sys.modules:
+            root_mod = modname.partition(".")[0]
+            if root_mod == "notebook":
+                import notebook
+
+                if int(notebook.__version__.partition(".")[0]) >= 7:
+                    # notebook 7 is a server extension,
+                    # it doesn't have IPythonHandler anymore
+                    continue
             base_handlers.append(import_item(base_handler_name))
 
     if not base_handlers:
